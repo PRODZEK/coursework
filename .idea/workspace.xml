@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e8bb0867-91c7-4c99-9dea-c5afd4840eb7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.htaccess" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/coursework.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/ApiResponse.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/auth.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/chats.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/controllers/AuthController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/controllers/ChatController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/controllers/MessageController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/messages.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/models/Chat.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/models/Message.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/models/User.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/updates.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/css/styles.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/api/auth-api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/api/chats-api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/api/messages-api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/app.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/auth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/chat.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/messages.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/realtime.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/templates.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/app.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/database.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/schema.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/includes/Database.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/includes/EventStream.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/includes/auth.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/includes/functions.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/includes/session.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/dashboard.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/login.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/logout.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/profile.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/register.php" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2xiiGgYE6MLZz7eZQLA3Tkkv8H9" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/wamp64/domains/coursework&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.webide.settings.project.settings.php&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\wamp64\domains\coursework" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PS-251.25410.148" />
+        <option value="bundled-php-predefined-a98d8de5180a-c5828cf854d9-com.jetbrains.php.sharedIndexes-PS-251.25410.148" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="StructureViewState">
+    <option name="selectedTab" value="PHP" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e8bb0867-91c7-4c99-9dea-c5afd4840eb7" name="Changes" comment="" />
+      <created>1748427208861</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1748427208861</updated>
+      <workItem from="1748427209292" duration="302000" />
+      <workItem from="1748432295307" duration="4605000" />
+      <workItem from="1748446723477" duration="898000" />
+      <workItem from="1748501624241" duration="10682000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
