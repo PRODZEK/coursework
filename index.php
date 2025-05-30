@@ -248,20 +248,42 @@ switch ($page) {
     <main>
         <?php 
         // Include the appropriate page template
-        $templateFile = __DIR__ . '/views/' . $page . '.php';
-        if (file_exists($templateFile)) {
-            include $templateFile;
+        $viewPath = __DIR__ . '/views/' . $page . '.php';
+        if (file_exists($viewPath)) {
+            include $viewPath;
         } else {
-            echo '<div class="container mx-auto px-4 py-8"><div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">Page not found.</div></div>';
+            echo '<div class="py-12 text-center">';
+            echo '<p class="text-red-600 text-xl">Error: View file not found - ' . htmlspecialchars($viewPath) . '</p>';
+            echo '</div>';
         }
         ?>
     </main>
     
-    <!-- Footer -->
-    <footer class="bg-white py-4 border-t mt-8">
-        <div class="container mx-auto px-4 text-center text-sm text-gray-500">
-            &copy; <?php echo date('Y'); ?> Chat App. All rights reserved.
-        </div>
-    </footer>
+    <!-- Debug information -->
+    <?php if (isset($_GET['debug'])): ?>
+    <div class="bg-gray-100 p-4 mt-8 mx-auto max-w-7xl">
+        <h3 class="text-lg font-bold">Debug Information</h3>
+        <p>Current page: <?php echo htmlspecialchars($page); ?></p>
+        <p>View path: <?php echo htmlspecialchars($viewPath); ?></p>
+        <p>File exists: <?php echo file_exists($viewPath) ? 'Yes' : 'No'; ?></p>
+        <p>APP_URL: <?php echo htmlspecialchars(APP_URL); ?></p>
+        <p>Current URL: <?php echo htmlspecialchars(getCurrentUrl()); ?></p>
+        <p>HTTP_HOST: <?php echo htmlspecialchars($_SERVER['HTTP_HOST']); ?></p>
+        <p>REQUEST_URI: <?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?></p>
+    </div>
+    <?php endif; ?>
+    
+    <!-- Custom scripts -->
+    <script>
+        // Check if browser notifications are supported
+        if ('Notification' in window) {
+            // Request permission for notifications when user interacts with the page
+            document.addEventListener('click', function() {
+                if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+                    Notification.requestPermission();
+                }
+            }, { once: true });
+        }
+    </script>
 </body>
 </html> 

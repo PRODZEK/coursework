@@ -7,7 +7,7 @@
 
 // Application settings
 define('APP_NAME', 'Chat App');
-define('APP_URL', 'http://localhost/coursework');
+define('APP_URL', 'http://coursework.local');
 define('APP_VERSION', '1.0.0');
 
 // Session settings
