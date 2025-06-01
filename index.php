@@ -99,19 +99,48 @@ switch ($page) {
                 extend: {
                     colors: {
                         primary: {
-                            100: '#E6F5FF',
-                            200: '#B3E0FF',
-                            300: '#80CCFF',
-                            400: '#4DB8FF',
-                            500: '#1AA3FF',
-                            600: '#0099FF',
-                            700: '#0077CC',
-                            800: '#005599',
-                            900: '#003366'
+                            50: '#EFF6FF',
+                            100: '#DBEAFE',
+                            200: '#BFDBFE',
+                            300: '#93C5FD',
+                            400: '#60A5FA',
+                            500: '#3B82F6',
+                            600: '#2563EB',
+                            700: '#1D4ED8',
+                            800: '#1E40AF',
+                            900: '#1E3A8A'
+                        },
+                        indigo: {
+                            50: '#EEF2FF',
+                            100: '#E0E7FF',
+                            200: '#C7D2FE',
+                            300: '#A5B4FC',
+                            400: '#818CF8',
+                            500: '#6366F1',
+                            600: '#4F46E5',
+                            700: '#4338CA',
+                            800: '#3730A3',
+                            900: '#312E81'
+                        },
+                        gray: {
+                            50: '#F9FAFB',
+                            100: '#F3F4F6',
+                            200: '#E5E7EB',
+                            300: '#D1D5DB',
+                            400: '#9CA3AF',
+                            500: '#6B7280',
+                            600: '#4B5563',
+                            700: '#374151',
+                            800: '#1F2937',
+                            900: '#111827'
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
                     }
                 }
             }
@@ -125,8 +154,8 @@ switch ($page) {
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F7F9FB;
-            color: #333;
+            background-color: #F5F7FB;
+            color: #1F2937;
         }
         
         .chat-container {
@@ -187,55 +216,61 @@ switch ($page) {
         
         /* Online status indicator */
         .status-indicator {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             display: inline-block;
+            box-shadow: 0 0 0 2px #fff;
         }
         
         .status-online {
-            background-color: #4CAF50;
+            background-color: #10B981; /* Emerald-500 */
         }
         
         .status-offline {
-            background-color: #9E9E9E;
+            background-color: #6B7280; /* Gray-500 */
         }
         
         .status-away {
-            background-color: #FFC107;
+            background-color: #F59E0B; /* Amber-500 */
         }
     </style>
 </head>
 <body>
     <?php if ($isLoggedIn): ?>
     <!-- Top navigation bar -->
-    <nav class="bg-white shadow-sm">
+    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between h-16">
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="<?php echo APP_URL; ?>/index.php" class="font-bold text-primary-600 text-lg">Chat App</a>
+                    <a href="<?php echo APP_URL; ?>/index.php" class="font-bold text-white text-xl flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                        Chat App
+                    </a>
                 </div>
                 <div class="flex items-center">
                     <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4">
-                        <a href="<?php echo APP_URL; ?>/index.php?page=chat" class="<?php echo $page === 'chat' ? 'text-primary-600 font-medium' : 'text-gray-500 hover:text-primary-600'; ?> px-3 py-2 text-sm">Chats</a>
-                        <a href="<?php echo APP_URL; ?>/index.php?page=profile" class="<?php echo $page === 'profile' ? 'text-primary-600 font-medium' : 'text-gray-500 hover:text-primary-600'; ?> px-3 py-2 text-sm">Profile</a>
-                        <a href="<?php echo APP_URL; ?>/index.php?page=logout" class="text-gray-500 hover:text-red-600 px-3 py-2 text-sm">Logout</a>
+                        <a href="<?php echo APP_URL; ?>/index.php?page=chat" class="<?php echo $page === 'chat' ? 'bg-indigo-800 bg-opacity-50' : 'hover:bg-indigo-800 hover:bg-opacity-50'; ?> px-4 py-2 text-sm rounded-md font-medium transition-colors duration-200">Chats</a>
+                        <a href="<?php echo APP_URL; ?>/index.php?page=profile" class="<?php echo $page === 'profile' ? 'bg-indigo-800 bg-opacity-50' : 'hover:bg-indigo-800 hover:bg-opacity-50'; ?> px-4 py-2 text-sm rounded-md font-medium transition-colors duration-200">Profile</a>
+                        <a href="<?php echo APP_URL; ?>/index.php?page=logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 text-sm rounded-md font-medium transition-colors duration-200">Logout</a>
                     </div>
                     <div class="flex items-center ml-4">
                         <div class="flex-shrink-0">
                             <div class="relative">
                                 <?php if ($currentUser && !empty($currentUser['profile_picture'])): ?>
-                                    <img class="h-8 w-8 rounded-full object-cover" src="<?php echo APP_URL . '/' . $currentUser['profile_picture']; ?>" alt="<?php echo htmlspecialchars($currentUser['username']); ?>">
+                                    <img class="h-9 w-9 rounded-full object-cover ring-2 ring-white" src="<?php echo APP_URL . '/' . $currentUser['profile_picture']; ?>" alt="<?php echo htmlspecialchars($currentUser['username']); ?>">
                                 <?php else: ?>
-                                    <div class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium">
+                                    <div class="h-9 w-9 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-white font-medium ring-2 ring-white">
                                         <?php echo strtoupper(substr($currentUser['username'], 0, 1)); ?>
                                     </div>
                                 <?php endif; ?>
-                                <span class="status-indicator status-<?php echo $currentUser['status']; ?> absolute bottom-0 right-0 transform translate-x-1 border-2 border-white"></span>
+                                <span class="status-indicator status-<?php echo $currentUser['status']; ?> absolute bottom-0 right-0 transform translate-x-1 border-2 border-indigo-700"></span>
                             </div>
                         </div>
                         <div class="ml-3">
-                            <div class="text-sm font-medium text-gray-700"><?php echo htmlspecialchars($currentUser['username']); ?></div>
+                            <div class="text-sm font-medium text-white"><?php echo htmlspecialchars($currentUser['username']); ?></div>
                         </div>
                     </div>
                 </div>

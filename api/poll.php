@@ -92,11 +92,34 @@ try {
         'success' => true,
         'timestamp' => $currentTimestamp,
         'status_updates' => [],
-        'messages' => []
+        'messages' => [],
+        'deleted_chats' => [],
+        'valid_chats' => [],
+        'read_updates' => [],
+        'chat_updates' => []
     ];
     
     // Якщо запитують конкретний чат, отримуємо нові повідомлення
     if ($chatId !== null) {
+        // First check if the chat still exists
+        $chatCheckSql = "SELECT chat_id FROM chats WHERE chat_id = ?";
+        $chatCheckStmt = $conn->prepare($chatCheckSql);
+        $chatCheckStmt->bind_param("i", $chatId);
+        $chatCheckStmt->execute();
+        $chatCheckResult = $chatCheckStmt->get_result();
+        
+        if ($chatCheckResult->num_rows === 0) {
+            // Chat has been deleted
+            $response['chat_deleted'] = true;
+            $chatCheckStmt->close();
+            
+            closeDbConnection($conn);
+            echo json_encode($response);
+            exit;
+        }
+        $chatCheckStmt->close();
+        
+        // Continue with getting messages for existing chat
         $messagesSql = "
             SELECT 
                 m.message_id, 
@@ -105,7 +128,8 @@ try {
                 m.message_text, 
                 m.message_type, 
                 m.file_url, 
-                m.sent_at,
+                UNIX_TIMESTAMP(m.sent_at) as sent_at_timestamp,
+                DATE_FORMAT(m.sent_at, '%Y-%m-%dT%H:%i:%s') as sent_at,
                 u.username as sender_name,
                 u.profile_picture as sender_profile_picture,
                 u.user_id as sender_id,
@@ -153,11 +177,88 @@ try {
         if (!empty($messages)) {
             $response['messages'] = $messages;
         }
+        
+        // Check for messages read by OTHERS in this chat (for messages sent BY THE CURRENT USER)
+        $readUpdatesSql = "
+            SELECT 
+                ms.message_id, 
+                MIN(ms.is_read) as all_recipients_read
+            FROM message_status ms
+            JOIN messages m ON ms.message_id = m.message_id
+            WHERE m.chat_id = ? AND m.sender_id = ? 
+            AND UNIX_TIMESTAMP(ms.read_at) > ?
+            GROUP BY ms.message_id
+        ";
+        $readStmt = $conn->prepare($readUpdatesSql);
+        $readStmt->bind_param("iii", $chatId, $userId, $lastUpdate);
+        $readStmt->execute();
+        $readResult = $readStmt->get_result();
+        while ($row = $readResult->fetch_assoc()) {
+            $response['read_updates'][] = [
+                'message_id' => $row['message_id'],
+                'is_read' => (bool)$row['all_recipients_read']
+            ];
+        }
+        $readStmt->close();
     } else {
+        // Global polling - check for deleted chats
+        $deletedChatsSql = "
+            SELECT dc.chat_id, 
+                UNIX_TIMESTAMP(dc.deleted_at) as deleted_at_timestamp,
+                DATE_FORMAT(dc.deleted_at, '%Y-%m-%dT%H:%i:%s') as deleted_at
+            FROM deleted_chats dc
+            JOIN deleted_chat_members dcm ON dc.chat_id = dcm.chat_id 
+            WHERE dcm.user_id = ? AND UNIX_TIMESTAMP(dc.deleted_at) > ?
+        ";
+        
+        $deletedChatsStmt = $conn->prepare($deletedChatsSql);
+        if ($deletedChatsStmt) {
+            $deletedChatsStmt->bind_param("ii", $userId, $lastUpdate);
+            $deletedChatsStmt->execute();
+            $deletedChatsResult = $deletedChatsStmt->get_result();
+            
+            $deletedChats = [];
+            if ($deletedChatsResult) {
+                while ($deletedChat = $deletedChatsResult->fetch_assoc()) {
+                    $deletedChats[] = $deletedChat['chat_id'];
+                }
+            }
+            
+            $deletedChatsStmt->close();
+            
+            if (!empty($deletedChats)) {
+                $response['deleted_chats'] = $deletedChats;
+            }
+        }
+        
+        // Get a fresh list of all valid chats for this user
+        $validChatsSql = "
+            SELECT c.chat_id 
+            FROM chats c 
+            JOIN chat_members cm ON c.chat_id = cm.chat_id 
+            WHERE cm.user_id = ?
+        ";
+        
+        $validChatsStmt = $conn->prepare($validChatsSql);
+        $validChatsStmt->bind_param("i", $userId);
+        $validChatsStmt->execute();
+        $validChatsResult = $validChatsStmt->get_result();
+        
+        $validChats = [];
+        while ($chat = $validChatsResult->fetch_assoc()) {
+            $validChats[] = $chat['chat_id'];
+        }
+        $validChatsStmt->close();
+        
+        $response['valid_chats'] = $validChats;
+        
         // Отримуємо оновлення статусів користувачів
         $statusSql = "
             SELECT 
-                user_id, status, last_seen
+                user_id, 
+                status, 
+                UNIX_TIMESTAMP(last_seen) as last_seen_timestamp,
+                DATE_FORMAT(last_seen, '%Y-%m-%dT%H:%i:%s') as last_seen
             FROM 
                 users
             WHERE 
@@ -179,6 +280,37 @@ try {
         
         if (!empty($statusUpdates)) {
             $response['status_updates'] = $statusUpdates;
+        }
+        
+        // Check if there are any updated chats (new messages, etc)
+        $chatUpdatesSql = "
+            SELECT 
+                c.chat_id,
+                UNIX_TIMESTAMP(c.updated_at) as updated_at_timestamp,
+                DATE_FORMAT(c.updated_at, '%Y-%m-%dT%H:%i:%s') as updated_at
+            FROM 
+                chats c
+            JOIN 
+                chat_members cm ON c.chat_id = cm.chat_id
+            WHERE 
+                cm.user_id = ?
+                AND UNIX_TIMESTAMP(c.updated_at) > ?
+        ";
+        
+        $chatUpdatesStmt = $conn->prepare($chatUpdatesSql);
+        $chatUpdatesStmt->bind_param("ii", $userId, $lastUpdate);
+        $chatUpdatesStmt->execute();
+        $chatUpdatesResult = $chatUpdatesStmt->get_result();
+        
+        $chatUpdates = [];
+        while ($chatUpdate = $chatUpdatesResult->fetch_assoc()) {
+            $chatUpdates[] = $chatUpdate['chat_id'];
+        }
+        
+        $chatUpdatesStmt->close();
+        
+        if (!empty($chatUpdates)) {
+            $response['chat_updates'] = $chatUpdates;
         }
     }
     

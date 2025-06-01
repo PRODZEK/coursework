@@ -71,4 +71,20 @@ CREATE TABLE IF NOT EXISTS message_status (
     UNIQUE KEY unique_message_user (message_id, user_id),
     FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-); 
+);
+
+-- Додаємо таблиці для відслідковування видалених чатів
+CREATE TABLE IF NOT EXISTS deleted_chats (
+    chat_id INT NOT NULL,
+    deleted_by INT NOT NULL,
+    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (chat_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS deleted_chat_members (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    chat_id INT NOT NULL,
+    user_id INT NOT NULL,
+    KEY chat_member_idx (chat_id, user_id),
+    KEY user_deleted_chats_idx (user_id, chat_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 

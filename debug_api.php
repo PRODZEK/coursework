@@ -79,7 +79,7 @@ try {
                 'message' => 'API returned non-JSON response',
                 'status' => $status,
                 'json_error' => json_last_error_msg(),
-                'raw_response_preview' => substr($response, 0, 1000) . (strlen($response) > 1000 ? '...' : '')
+                'raw_response_preview' => debug_api . phpsubstr($response, 0, 1000) . (strlen($response) > 1000 ? '...' : '')
             ]);
         } else {
             // JSON відповідь успішна

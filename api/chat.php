@@ -324,6 +324,127 @@ try {
                     echo json_encode($result);
                     break;
                     
+                case 'upload_file':
+                    // Check if user is logged in
+                    if (!isLoggedIn()) {
+                        http_response_code(401);
+                        echo json_encode(['success' => false, 'message' => 'Authentication required']);
+                        exit;
+                    }
+                    
+                    // Validate chat ID
+                    if (!isset($_POST['chat_id'])) {
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'message' => 'Chat ID is required']);
+                        exit;
+                    }
+                    
+                    $chatId = (int)$_POST['chat_id'];
+                    $userId = $_SESSION['user_id'];
+                    
+                    // Check if file was uploaded
+                    if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+                        $errorMessage = isset($_FILES['file']) ? getFileUploadErrorMessage($_FILES['file']['error']) : 'No file uploaded';
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'message' => $errorMessage]);
+                        exit;
+                    }
+                    
+                    // Debug information
+                    error_log('File upload received: ' . $_FILES['file']['name'] . ', type: ' . $_FILES['file']['type'] . ', size: ' . $_FILES['file']['size']);
+                    
+                    // Handle file upload
+                    $result = uploadChatFile($_FILES['file'], $chatId, $userId);
+                    
+                    // ---- START DEBUG LOGS ----
+                    error_log('[API UPLOAD_FILE] uploadChatFile result: ' . json_encode($result));
+                    // ---- END DEBUG LOGS ----
+
+                    if ($result['success']) {
+                        // Debug information
+                        error_log('File uploaded successfully: ' . $result['file_url']);
+                        
+                        // Send file message to chat
+                        $messageType = $result['type'];
+                        $messageText = $result['original_name'];
+                        $fileUrl = $result['file_url']; // This is the critical variable
+                        
+                        // ---- START DEBUG LOGS ----
+                        error_log('[API UPLOAD_FILE] Preparing to send message. Type: ' . $messageType . ', Text: ' . $messageText . ', FileURL: ' . $fileUrl);
+                        // ---- END DEBUG LOGS ----
+                        
+                        $sendResult = sendMessage($chatId, $userId, $messageText, $messageType, $fileUrl);
+                        
+                        // ---- START DEBUG LOGS ----
+                        error_log('[API UPLOAD_FILE] sendMessage result: ' . json_encode($sendResult));
+                        // ---- END DEBUG LOGS ----
+
+                        if ($sendResult['success']) {
+                            // Ensure file_url is included in the response data
+                            if (!isset($sendResult['data']['file_url'])) {
+                                $sendResult['data']['file_url'] = $fileUrl;
+                            }
+                            
+                            echo json_encode([
+                                'success' => true,
+                                'message' => 'File uploaded and message sent',
+                                'file_url' => $fileUrl,
+                                'message_id' => $sendResult['message_id'],
+                                'data' => $sendResult['data']
+                            ]);
+                            
+                            // Debug information
+                            error_log('Message sent with file: ' . $sendResult['message_id']);
+                        } else {
+                            error_log('Failed to send message: ' . $sendResult['message']);
+                            echo json_encode([
+                                'success' => false,
+                                'message' => 'File uploaded but failed to send message: ' . $sendResult['message']
+                            ]);
+                        }
+                    } else {
+                        error_log('Failed to upload file: ' . $result['message']);
+                        http_response_code(400);
+                        echo json_encode($result);
+                    }
+                    break;
+                    
+                default:
+                    http_response_code(400);
+                    echo json_encode([
+                        'success' => false, 
+                        'message' => 'Invalid action'
+                    ]);
+                    break;
+            }
+            break;
+            
+        case 'DELETE':
+            // Check which action is requested
+            $action = isset($_GET['action']) ? $_GET['action'] : '';
+            
+            switch ($action) {
+                case 'delete_chat':
+                    // Delete chat
+                    if (!isset($_GET['chat_id'])) {
+                        http_response_code(400);
+                        echo json_encode([
+                            'success' => false, 
+                            'message' => 'Chat ID required'
+                        ]);
+                        exit;
+                    }
+                    
+                    $chatId = (int) $_GET['chat_id'];
+                    $result = deleteChat($chatId, $userId);
+                    
+                    if (!$result['success']) {
+                        http_response_code(403);
+                    }
+                    
+                    echo json_encode($result);
+                    break;
+                    
                 default:
                     http_response_code(400);
                     echo json_encode([
@@ -365,7 +486,6 @@ function markMessagesAsRead($chatId, $userId, $messageId = null) {
     $memberCheckResult = $memberCheckStmt->get_result();
     
     if ($memberCheckResult->num_rows === 0) {
-        // User is not a member of this chat
         $memberCheckStmt->close();
         closeDbConnection($conn);
         return ['success' => false, 'message' => 'You are not a member of this chat'];
@@ -374,36 +494,47 @@ function markMessagesAsRead($chatId, $userId, $messageId = null) {
     $memberCheckStmt->close();
     
     try {
+        $updatedCount = 0;
         if ($messageId !== null) {
-            // Mark specific message as read
+            // Mark specific message as read for the current user
             $updateSql = "
                 UPDATE message_status 
                 SET is_read = 1, read_at = NOW() 
-                WHERE message_id = ? AND user_id = ?
+                WHERE message_id = ? AND user_id = ? AND is_read = 0
             ";
             $updateStmt = $conn->prepare($updateSql);
             $updateStmt->bind_param("ii", $messageId, $userId);
             $updateStmt->execute();
+            $updatedCount = $updateStmt->affected_rows;
             $updateStmt->close();
         } else {
-            // Mark all unread messages in the chat as read
+            // Mark all unread messages in the chat as read for the current user
+            // This should only apply to messages *sent by others* to this user.
             $updateSql = "
                 UPDATE message_status ms
                 JOIN messages m ON ms.message_id = m.message_id
                 SET ms.is_read = 1, ms.read_at = NOW() 
-                WHERE m.chat_id = ? AND ms.user_id = ? AND ms.is_read = 0
+                WHERE m.chat_id = ? AND ms.user_id = ? AND m.sender_id != ? AND ms.is_read = 0
             ";
             $updateStmt = $conn->prepare($updateSql);
-            $updateStmt->bind_param("ii", $chatId, $userId);
+            $updateStmt->bind_param("iii", $chatId, $userId, $userId);
             $updateStmt->execute();
+            $updatedCount = $updateStmt->affected_rows;
             $updateStmt->close();
         }
         
         closeDbConnection($conn);
         
+        if ($updatedCount > 0) {
+            // Prepare data for WebSocket broadcast or polling update
+            // For now, we rely on polling to pick up these changes.
+             error_log("User $userId marked $updatedCount messages as read in chat $chatId");
+        }
+        
         return [
             'success' => true,
-            'message' => 'Messages marked as read'
+            'message' => 'Messages marked as read',
+            'updated_count' => $updatedCount
         ];
     } catch (Exception $e) {
         closeDbConnection($conn);

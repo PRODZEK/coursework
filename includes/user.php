@@ -46,6 +46,8 @@ function registerUser($username, $email, $password) {
     $result = $stmt->get_result();
     
     if ($result->num_rows > 0) {
+        $stmt->close();
+        closeDbConnection($conn);
         return ['success' => false, 'message' => 'Username or email already exists'];
     }
     
@@ -57,6 +59,9 @@ function registerUser($username, $email, $password) {
     $stmt->bind_param("sss", $username, $email, $hashedPassword);
     $success = $stmt->execute();
     
+    // Get the inserted user ID before closing the connection
+    $insertedId = $success ? $conn->insert_id : 0;
+    
     $stmt->close();
     closeDbConnection($conn);
     
@@ -64,7 +69,7 @@ function registerUser($username, $email, $password) {
         return [
             'success' => true, 
             'message' => 'Registration successful. You can now login.',
-            'user_id' => $conn->insert_id
+            'user_id' => $insertedId
         ];
     } else {
         return ['success' => false, 'message' => 'Registration failed. Please try again.'];
@@ -367,7 +372,7 @@ function updateProfilePicture($userId, $file) {
         
         // Delete old profile picture if it exists
         if ($success && !empty($user['profile_picture'])) {
-            $oldFile = __DIR__ . '/../' . $user['profile_picture'];
+            $oldFile = __DIR__ . '/coursework/' . $user['profile_picture'];
             if (file_exists($oldFile)) {
                 unlink($oldFile);
             }

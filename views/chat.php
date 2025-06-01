@@ -142,6 +142,67 @@
         margin-top: 0.25rem;
         flex-shrink: 0;
     }
+    
+    /* Fixed chat header */
+    #chat-header {
+        height: 64px;
+        flex-shrink: 0;
+    }
+    
+    /* Emoji picker styles */
+    .emoji-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        text-align: center;
+        border-radius: 0.25rem;
+        transition: background-color 0.15s ease;
+    }
+    
+    .emoji-item:hover {
+        background-color: #f3f4f6;
+    }
+    
+    #emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.25rem;
+        padding: 0.5rem;
+    }
+    
+    /* Fix for mobile view */
+    @media (max-width: 640px) {
+        .chat-container {
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        #chat-list-container {
+            width: 100%;
+            height: 40vh;
+            min-height: 40vh;
+            max-height: 40vh;
+        }
+        
+        #chat-content {
+            width: 100%;
+            height: 60vh;
+            min-height: 60vh;
+        }
+        
+        #chat-messages {
+            height: calc(100% - 128px);
+            max-height: calc(100% - 128px);
+        }
+        
+        .message-outgoing,
+        .message-incoming {
+            max-width: 85vw;
+        }
+    }
 </style>
 
 <div class="chat-container flex h-full">
@@ -240,15 +301,71 @@
             </div>
             
             <!-- Message Input -->
-            <div id="message-input-container" class="p-4 bg-white border-t border-gray-200 sticky bottom-0 left-0 right-0 z-10 shadow-md">
-                <form id="message-form" class="flex items-center">
-                    <input type="text" id="message-text" class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Type a message..." autocomplete="off">
-                    <button type="submit" id="send-message-button" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-primary-500" tabindex="0" aria-label="Send message">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
+            <div id="message-input-container" class="p-3 bg-gray-50 border-t border-gray-200 sticky bottom-0 left-0 right-0 z-10 shadow-md">
+                <form id="message-form" class="flex items-center gap-2 bg-white border border-gray-300 rounded-xl px-2 py-1">
+                    <!-- Left Icons Group -->
+                    <div class="flex items-center">
+                        <!-- Attachment -->
+                        <div class="flex-shrink-0">
+                        <button type="button" id="attachment-button" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none" aria-label="Attach files">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                        </button>
+                        <input type="file" id="file-input" class="hidden" multiple accept="image/*,video/*,audio/*,application/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+                    </div>
+                        <!-- Emoji Button & Picker -->
+                        <div class="flex-shrink-0 relative">
+                        <button type="button" id="emoji-button" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none" aria-label="Insert emoji">
+                                <!-- Standard Smiley Face Emoji Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-6.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm5 0c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-.42-3.03c-.37-.37-.88-.58-1.41-.58h-2.34c-.53 0-1.04.21-1.41.58-.37.37-.58.88-.58 1.41 0 .2.03.39.08.58.16.67.76 1.15 1.45 1.28.15.03.3.04.45.04s.3-.01.45-.04c.7-.13 1.29-.61 1.45-1.28.05-.19.08-.38.08-.58 0-.53-.21-1.04-.58-1.41z"/>
+                                </svg>
+                            </button>
+                            <!-- Emoji Picker Container -->
+                            <div id="emoji-picker-container" class="hidden fixed z-50">
+                                <div id="emoji-picker" class="bg-white border border-gray-200 rounded-lg shadow-xl w-80 h-72 overflow-y-auto transform transition-all duration-300 ease-in-out scale-95 opacity-0">
+                                    <div class="p-2 border-b border-gray-200 flex justify-between items-center">
+                                        <h3 class="text-sm font-medium text-gray-700">Select Emoji</h3>
+                                        <button type="button" id="close-emoji-picker" class="p-1 rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600 focus:outline-none" aria-label="Close emoji picker">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                                    <div id="emoji-grid" class="p-2 grid grid-cols-5 gap-1">
+                                        <!-- Emojis will be loaded here by JavaScript -->
+                                    </div>
+                                </div>
+                                <!-- Arrow pointing to the button -->
+                                <div class="absolute left-1/2 -translate-x-1/2 bottom-[-8px] w-4 h-4 bg-white border-b border-r border-gray-200 transform rotate-45"></div>
+                            </div>
+                        </div>
+                        <!-- Mic Button -->
+                        <div class="flex-shrink-0">
+                        <button type="button" id="audio-record-button" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none" aria-label="Record audio message">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                        </button>
+                        </div>
+                    </div>
+                    <div id="selected-attachments" class="hidden flex-wrap items-center mb-2 gap-2"></div>
+                    <!-- Textarea -->
+                    <div class="relative flex-1">
+                        <textarea id="message-text" rows="1" class="w-full p-2.5 border-none focus:outline-none focus:ring-0 resize-none overflow-y-auto bg-transparent placeholder-gray-500 text-sm" placeholder="Type your message..."></textarea>
+                    </div>
+                    <!-- Send Button -->
+                    <div class="flex-shrink-0">
+                        <button type="submit" id="send-button" class="p-2.5 rounded-full bg-primary-600 text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500" aria-label="Send message">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                            </svg>
+                        </button>
+                    </div>
                 </form>
+                <!-- Emoji Picker Backdrop -->
+                <div id="emoji-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-0 z-10 transition-opacity duration-300 ease-in-out"></div>
             </div>
         </div>
     </div>
@@ -383,6 +500,51 @@
             <button id="save-settings-button" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" tabindex="0" aria-label="Save settings">
                 Save Settings
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Chat Confirmation Modal -->
+<div id="delete-chat-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-50" id="delete-chat-backdrop"></div>
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 z-10 relative">
+        <div class="text-center">
+            <svg class="h-12 w-12 text-red-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Chat</h3>
+            <p class="text-gray-600 mb-6" id="delete-chat-message">Are you sure you want to delete this chat? This action cannot be undone.</p>
+            
+            <div class="flex justify-center space-x-4">
+                <button id="cancel-delete-chat" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+                <button id="confirm-delete-chat" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Audio recording UI -->
+<div id="audio-recording-ui" class="hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-50">
+    <div class="flex items-center justify-between max-w-7xl mx-auto">
+        <div class="flex items-center">
+            <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center animate-pulse mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+            </div>
+            <div>
+                <div class="text-sm font-medium">Recording audio message</div>
+                <div id="recording-time" class="text-xs text-gray-500">00:00</div>
+            </div>
+        </div>
+        <div class="flex items-center">
+            <button id="cancel-recording" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mr-2">Cancel</button>
+            <button id="stop-recording" class="px-4 py-2 text-sm bg-primary-600 text-white hover:bg-primary-700 rounded-md">Send</button>
         </div>
     </div>
 </div>
@@ -637,4 +799,7 @@
             max-width: 85vw;
         }
     }
-</style> 
+</style>
+</div>
+</body>
+</html> 

@@ -70,7 +70,7 @@ echo "<h2>Checking File Permissions</h2>";
 $dirs = ['views', 'includes', 'api', 'assets'];
 echo "<ul>";
 foreach ($dirs as $dir) {
-    $path = __DIR__ . '/' . $dir;
+    $path = __DIR__ . 'debug.php/' . $dir;
     if (is_readable($path)) {
         echo "<li style='color: green;'>Directory '$dir' is readable</li>";
     } else {
